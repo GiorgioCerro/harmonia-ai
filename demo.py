@@ -4,31 +4,28 @@ from harmonia_ai.harmonia import HarmoniA
 # Initialize HarmoniA
 harmonia = HarmoniA()
 
-@cl.step(type="tool")
-async def tool():
-    # Fake tool
-    await cl.sleep(2)
-    return "Response from the tool!"
-
-
-@cl.on_message  # this function will be called every time a user inputs a message in the UI
+@cl.on_message
 async def main(message: cl.Message):
     """
-    This function is called every time a user inputs a message in the UI.
-    It sends back an intermediate response from the tool, followed by the final answer.
-
-    Args:
-        message: The user's message.
-
-    Returns:
-        None.
+    Handles user messages in Chainlit while maintaining memory.
     """
 
-    # Send an intermediate message
-    await cl.Message(content="Thinking...").send()
+    # Retrieve stored messages (initialize if empty)
+    stored_messages = cl.user_session.get("messages", [])
+    stored_messages.append(message.content)  # Add new message
 
-    # Get response from HarmoniA
-    response = await harmonia.ask_harmonia(message.content)
+    
 
-    # Send the final response
-    await cl.Message(content=response).send()
+    try:
+        # Stream responses from HarmoniA
+        async for response in harmonia.ask_harmonia("\n".join(stored_messages)):  
+            await cl.Message(content=response).send()
+
+            # Store updated memory back into the session
+            stored_messages.append(response)
+            cl.user_session.set("messages", stored_messages)
+        print("---")
+        print(stored_messages)
+        print("---")
+    except Exception as e:
+        await cl.Message(content=f"Error: {str(e)}").send()

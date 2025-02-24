@@ -62,13 +62,6 @@ class HarmoniA:
         agent = self.agent_factory.create_agent(agent_type)
 
         def agent_node(state: State) -> Command[Literal["supervisor"]]:
-            if agent_type in ["financial", "connection", "email"]:
-                state["messages"][
-                    -1
-                ].content += f"\nBusiness ID: {state['business_id']}"
-            elif agent_type in ["client_info"] or agent_type == "email":
-                state["messages"][-1].content += f"\nUser ID: {state['user_id']}"
-
             result = agent.invoke(state)
             return Command(
                 update={
@@ -151,6 +144,6 @@ class HarmoniA:
                 if "supervisor" not in list(response.keys()):
                     messages = list(response.values())[0].get("messages", [])
                     if messages:
-                        return messages[0].content  
+                        yield messages[0].content  
         except Exception as e:
-            return f"Error in ask_harmonia: {e}"
+            yield f"Error in ask_harmonia: {e}"
