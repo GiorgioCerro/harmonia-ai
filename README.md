@@ -3,7 +3,7 @@
 Inspired by “Harmony” and “AI,” HarmoniA represents a balanced approach to fitness, nutrition, and mental well-being through intelligent conversational agents.
 
 <p align="center">
-  <img src="images/harmonia-logo.png" alt="HarmoniA AI Logo" width="200">
+  <img src="images/harmonia-logo" alt="HarmoniA AI Logo" width="200">
 </p>
 
 ## About HarmoniA
