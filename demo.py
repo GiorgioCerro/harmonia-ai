@@ -1,8 +1,10 @@
 import chainlit as cl
+
 from harmonia_ai.harmonia import HarmoniA
 
 # Initialize HarmoniA
 harmonia = HarmoniA()
+
 
 @cl.on_message
 async def main(message: cl.Message):
@@ -14,11 +16,9 @@ async def main(message: cl.Message):
     stored_messages = cl.user_session.get("messages", [])
     stored_messages.append(message.content)  # Add new message
 
-    
-
     try:
         # Stream responses from HarmoniA
-        async for response in harmonia.ask_harmonia("\n".join(stored_messages)):  
+        async for response in harmonia.ask_harmonia("\n".join(stored_messages)):
             await cl.Message(content=response).send()
 
             # Store updated memory back into the session

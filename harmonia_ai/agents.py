@@ -1,8 +1,8 @@
 from typing import Any
 
 from langchain_core.language_models.chat_models import BaseChatModel
-from langchain_openai import ChatOpenAI
 from langgraph.prebuilt import create_react_agent
+
 
 class AgentFactory:
     def __init__(self, llm: BaseChatModel):
@@ -20,7 +20,6 @@ class AgentFactory:
         self.chef_tools = []
         self.trainer_tools = []
         self.mental_coach_tools = []
-        
 
     def create_agent(self, agent_type: str) -> Any:
         """Create and return an agent based on the given type.
@@ -56,7 +55,7 @@ class AgentFactory:
             tools=[],
             state_modifier="""You are a personal trainer.""",
         )
-    
+
     def _create_mental_coach_agent(self):
         """Create mental coach agent."""
         return create_react_agent(
