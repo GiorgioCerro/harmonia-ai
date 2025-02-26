@@ -10,6 +10,10 @@ from langchain_openai import ChatOpenAI
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import END, START, MessagesState, StateGraph
 from langgraph.types import Command, interrupt
+from harmonia_ai.agents import AgentFactory
+
+from dotenv import load_dotenv
+load_dotenv()
 
 class State(MessagesState):
     next: str
@@ -18,6 +22,7 @@ class HarmoniA:
     def __init__(self):
         """Initialize the HarmoniA class."""
         self.llm = ChatOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        self.agent_factory = AgentFactory(self.llm)
         self.memory = MemorySaver()
         self.graph = self._create_graph()
 
@@ -102,7 +107,7 @@ class HarmoniA:
         Returns:
             StateGraph: Compiled workflow graph
         """
-        members = []
+        members = ["chef", "trainer", "mental_coach"]
         # Create the graph
         super_builder = StateGraph(State)
 
