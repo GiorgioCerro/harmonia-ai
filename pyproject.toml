@@ -1,0 +1,40 @@
+[project]
+name = "harmonia-ai"
+dynamic = ["version"]
+authors = [{name = "Giorgio Cerro"}]
+maintainers = [{name = "Giorgio Cerro"}]
+description = "Conversational Agent for Personal Wellness"
+readme = {file = "README.rst", content-type = "text/x-rst"}
+requires-python = ">=3.12"
+license = {file = "LICENSE.txt"}
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent"
+]
+dependencies = [
+    "chainlit >=  2.2.1",
+    "langgraph >= 0.2.74",
+]
+
+
+[project.urls]
+repository = "https://github.com/GiorgioCerro/harmonia-ai"
+
+
+[tool.ruff]
+line-length = 88
+indent-width = 4
+target-version = "py310"
+
+
+[tool.ruff.lint]
+ignore = ["ANN401", "ANN101", "ANN"]
+select = [
+  "F",
+  "E",
+  "I",
+]
+# Don't use the automatic fixing for now.
+fixable = ["I"]
+unfixable = ["F", "E"]

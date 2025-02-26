@@ -1,18 +1,17 @@
 import datetime
-import json
-import logging
 import os
-import re
-from typing import Any, Callable, Literal, Optional
-from typing_extensions import TypedDict
+from typing import Any, Literal
+
+from dotenv import load_dotenv
 from langchain_core.messages import HumanMessage
 from langchain_openai import ChatOpenAI
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import END, START, MessagesState, StateGraph
-from langgraph.types import Command, interrupt
+from langgraph.types import Command
+from typing_extensions import TypedDict
+
 from harmonia_ai.agents import AgentFactory
 
-from dotenv import load_dotenv
 load_dotenv()
 
 class State(MessagesState):
@@ -28,10 +27,10 @@ class HarmoniA:
 
     def make_super_supervisor_node(self, members: list[str]) -> str:
         options = ["FINISH"] + members
-        system_prompt = f"""You are a supervisor tasked with managing a conversation between the
-            following workers: {members}. Use chat_tool to handle simple conversation,
-            use web_search for searching the web, use researcher to generate report when asked.
-            Given the following user request,
+        system_prompt = f"""You are a supervisor tasked with managing a conversation
+            between the following workers: {members}. Use chat_tool to handle simple
+            conversation, use web_search for searching the web, use researcher to
+            generate report when asked. Given the following user request,
             respond with the worker to act next. Each worker will perform a
             task and respond with their results and status. When finished,
              respond with FINISH."""
@@ -83,10 +82,12 @@ class HarmoniA:
 
     def conversation_node(self, state) -> Command[Literal["supervisor"]]:
         """Node for conversation with the user."""
-        prompt = f"""You are HarmoniA, a conversational AI assistant. You will be assisting
-        the user engaging with simple conversation, answering questions, and providing
-        information. Your goal is to maintain a friendly and professional.
-        Always be positive and helpful.
+        prompt = f"""You are HarmoniA, a conversational AI assistant. You will be
+        assisting the user engaging with simple conversation, answering questions,
+        and providing information. Your goal is to maintain a friendly and
+        professional. Always be positive and helpful.
+
+        Today's {datetime.datetime.now().strftime("%Y-%m-%d")}
         """
         response = self.llm.invoke(
             [{"role": "system", "content": state["messages"][-1].content + prompt}]
@@ -139,7 +140,7 @@ class HarmoniA:
             Any: Response from HarmoniA
         """
         config = {"configurable": {"thread_id": chat_id}}
-        try: 
+        try:
             async for response in self.graph.astream(
                 {"messages": [HumanMessage(content=prompt)]},
                 config,
@@ -149,6 +150,6 @@ class HarmoniA:
                 if "supervisor" not in list(response.keys()):
                     messages = list(response.values())[0].get("messages", [])
                     if messages:
-                        yield messages[0].content  
+                        yield messages[0].content
         except Exception as e:
             yield f"Error in ask_harmonia: {e}"
